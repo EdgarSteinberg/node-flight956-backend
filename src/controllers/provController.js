@@ -1,7 +1,7 @@
 import ProvDao from "../dao/provDao.js";
 const provDao = new ProvDao();
 
-class ProvController {
+class ProvManager {
     
     async getAllProv() {
         return await provDao.getAllProvDao();
@@ -19,11 +19,11 @@ class ProvController {
     }
 
     async createProv(prov) {
-        const { name, country } = prov;
+        const { name, country, image } = prov;
         if (!name) throw new Error("Debes agregar la provincia.");
 
         try {
-            const result = await provDao.createProvDao({ name, country });
+            const result = await provDao.createProvDao({ name, country, image });
             return result;
         } catch (error) {
             throw new Error(`Error al crear la provincia. ${error.message}`);
@@ -59,4 +59,4 @@ class ProvController {
     }
 }
 
-export default ProvController;
+export default ProvManager;

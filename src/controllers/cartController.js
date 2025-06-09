@@ -29,30 +29,58 @@ class CartManager {
         }
     }
 
-    async addProductInCart(cid,pid,referencia,quantity){
+    // async addProductInCart(cid,pid,referencia,quantity){
+    //     const cart = await this.getCartById(cid);
+    //     if (!cart) throw new Error(`El carrito con ID: ${cid} no encontrado`);
+
+    //     if (!pid) throw new Error("Falta el ID del producto (pid).");
+
+    //     const referenciasPermitidas = ['vuelos_fli', 'hotel_fli', 'paquete_fli'];
+    //     if (!referenciasPermitidas.includes(referencia)) {
+    //         throw new Error(`El tipo de referencia '${referencia}' no es válido.`);
+    //     }
+
+    //     const qty = parseInt(quantity);
+
+    //     if (isNaN(qty) || qty <= 0) {
+    //         throw new Error("Cantidad inválida.");
+    //     }
+
+    //     try{
+    //         const result = await cartDao.addProductCartDao(cid,pid,referencia,quantity);
+    //         return result;
+    //     }catch(error){
+    //         throw new Error(`Error al añadir un producto al carrito ${error.message}`);
+    //     }
+    // }
+
+    async addProductInCart(cid, pid, referencia, quantity) {
+        // Validaciones
+        if (!pid) throw new Error("Falta el ID del producto");
+        if (!referencia || !["hotel", "vuelo", "paquete"].includes(referencia)) {
+            throw new Error("Referencia de producto inválido");
+        }
+    
+        const cantidad = Number(quantity);
+        if (isNaN(cantidad) || cantidad <= 0) {
+            throw new Error("La cantidad debe ser un número válido y mayor que 0");
+        }
+    
         const cart = await this.getCartById(cid);
-        if (!cart) throw new Error(`El carrito con ID: ${cid} no encontrado`);
-
-        if (!pid) throw new Error("Falta el ID del producto (pid).");
-
-        const referenciasPermitidas = ['vuelos_fli', 'hotel_fli', 'paquete_fli'];
-        if (!referenciasPermitidas.includes(referencia)) {
-            throw new Error(`El tipo de referencia '${referencia}' no es válido.`);
-        }
-
-        const qty = parseInt(quantity);
-
-        if (isNaN(qty) || qty <= 0) {
-            throw new Error("Cantidad inválida.");
-        }
-
-        try{
-            const result = await cartDao.addProductCartDao(cid,pid,referencia,quantity);
+        if (!cart) throw new Error(`Carrito con ID ${cid} no encontrado`);
+    
+        // Ejecución principal
+        try {
+            const result = await cartDao.addProductToCartDao(cart._id, pid,referencia, cantidad);
             return result;
-        }catch(error){
-            throw new Error(`Error al añadir un producto al carrito ${error.message}`);
+        } catch (error) {
+            console.error("Error en addProductInCart:", error);
+            throw new Error(`Error al agregar producto al carrito: ${error.message}`);
         }
     }
+    
+
+
 
     async deleteProductInCart(cid, pid, referencia) {
         const cart = await this.getCartById(cid);
@@ -60,7 +88,9 @@ class CartManager {
 
         if (!pid) throw new Error("Falta el ID del producto (pid).");
 
-        const referenciasPermitidas = ['vuelos_fli', 'hotel_fli', 'paquete_fli'];
+        //const referenciasPermitidas = ['vuelos_fli', 'hotel_fli', 'paquete_fli'];
+        const referenciasPermitidas = ['vuelo', 'hotel', 'paquete'];
+
         if (!referenciasPermitidas.includes(referencia)) {
             throw new Error(`El tipo de referencia '${referencia}' no es válido.`);
         }

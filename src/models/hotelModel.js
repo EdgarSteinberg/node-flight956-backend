@@ -8,6 +8,7 @@ const hotelSchema = new mongoose.Schema({
     location: { type: mongoose.Schema.Types.ObjectId, ref: "prov_fli", required: true },
     description: { type: String, required: true },
     stars: { type: Number, required: true, enum: [1, 2, 3, 4, 5] },
+    numberOfNights: { type: Number, required: true },
     nightPrice : { type: Number, required: true, min: 1 },
     price: { type: Number, required: true },
     breakfastIncluded: { type: Boolean, default: false }

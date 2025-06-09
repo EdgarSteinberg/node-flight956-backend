@@ -3,8 +3,9 @@ import hotelModel from "../models/hotelModel.js";
 class HotelDao {
 
     async getAllHotelDao() {
-        return await hotelModel.find().lean();
+        return await hotelModel.find().populate('location').lean();
     }
+
 
     async getHotelByIdDao(hid) {
         return await hotelModel.findById(hid).populate('location');

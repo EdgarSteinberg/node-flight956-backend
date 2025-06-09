@@ -17,7 +17,15 @@ const userSchema = new mongoose.Schema({
         minlength: 5,
         required: true
     },
-    role: {type: String, enum: ['admin', 'premium', 'user'], default: 'user'}
+    role: { type: String, enum: ['admin', 'premium', 'user'], default: 'user' },
+    cart: { type: mongoose.Schema.Types.ObjectId, ref: 'cart_fli' },
+    documents: [
+        {
+            name: { type: String, required: true },      // nombre original del archivo
+            reference: { type: String, required: true }, // ruta o URL del archivo
+        }
+    ],
+    last_connection: { type: Date, default: Date.now }
 });
 
 
@@ -26,25 +34,3 @@ const userModel = mongoose.model(userCollection, userSchema);
 export default userModel;
 
 
-/*
-  const HotelSchema = new mongoose.Schema({
-  name: String,
-  location: String,
-  description: String,
-  pricePerNight: Number,
-  amenities: [String],
-  images: [String],
-  availableRooms: Number
-});
-
-const FlightSchema = new mongoose.Schema({
-  airline: String,
-  origin: String,
-  destination: String,
-  departureTime: Date,
-  arrivalTime: Date,
-  price: Number,
-  seatsAvailable: Number,
-  flightCode: String
-});
- */

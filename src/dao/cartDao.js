@@ -1,4 +1,4 @@
-import cartModels from "../models/cart.js";
+import cartModels from "../models/cartModel.js";
 
 class CartDao {
 
@@ -6,56 +6,116 @@ class CartDao {
         return await cartModels.find();
     }
 
+
     async getCartByIdDao(cid) {
-        return await cartModels.findById(cid).populate('productos.productoSchemaId')
+        return await cartModels.findById(cid)
+            .populate({
+                path: 'productos.productoPaquete',
+                populate: [
+                    {
+                        path: 'vuelo',
+                        model: 'vuelos_fli',
+                        populate: [
+                            { path: 'origen', model: 'prov_fli' },
+                            { path: 'destino', model: 'prov_fli' }
+                        ]
+                    },
+                    {
+                        path: 'hotel',
+                        model: 'hotel_fli',
+                        populate: { path: 'location', model: 'prov_fli' }
+                    },
+                    {
+                        path: 'destino',
+                        model: 'prov_fli'
+                    }
+                ]
+            })
+            .populate({
+                path: 'productos.productoHotel',
+                model: 'hotel_fli',
+                populate: { path: 'location', model: 'prov_fli' }
+            })
+            .populate({
+                path: 'productos.productoVuelo',
+                model: 'vuelos_fli',
+                populate: [
+                    { path: 'origen', model: 'prov_fli' },
+                    { path: 'destino', model: 'prov_fli' }
+                ]
+            })
+            .populate({ path: 'productos.productoHotel', model: 'hotel_fli' })
+            // .populate({ path: 'productos.productoVuelo', model: 'vuelos_fli', })
+            .populate({
+                path: 'productos.productoVuelo',
+                populate: [
+                    { path: 'destino' },
+                    { path: 'origen' }
+                ]
+            })
+            .lean(); // <- .lean() SIEMPRE AL FINAL, después del populate
     }
+
 
     async createCartDao() {
         return await cartModels.create({})
     }
-    // cid:     ID del carrito al que se quiere agregar el producto.
-    // pid:     ID del producto seleccionado por el usuario. Este puede ser de tipo vuelo, hotel o paquete.
-    // tipo:    Tipo de producto que se está agregando. Puede ser 'vuelos_fli', 'hotel_fli' o 'paquete_fli'.
-    // quantity: Cantidad de unidades del producto que el usuario desea agregar al carrito
-    async addProductCartDao(cid, pid, referencia, quantity) {
-        const cart = await cartModels.findOne({ _id: cid, "productos.productoSchemaId": pid, "productos.referenciaSchema": referencia });
 
-        if (cart) {
-            return await cartModels.findOneAndUpdate(
-                { _id: cid, "productos.productoSchemaId": pid, "productos.referenciaSchema": referencia },
-                { $inc: { "productos.$.quantity": quantity } },
-                { new: true }
-            );
+
+
+    async addProductToCartDao(cid, pid, referencia, quantity = 1) {
+        const cart = await cartModels.findById(cid);
+        if (!cart) throw new Error("Carrito no encontrado");
+
+        const fieldMap = {
+            hotel: "productoHotel",
+            vuelo: "productoVuelo",
+            paquete: "productoPaquete"
+        };
+
+        const campoProducto = fieldMap[referencia];
+        if (!campoProducto) throw new Error("Tipo de producto inválido");
+
+        // Buscamos si el producto ya está en el carrito
+        const existingItemIndex = cart.productos.findIndex(p => p[campoProducto]?.toString() === pid);
+
+        if (existingItemIndex !== -1) {
+            cart.productos[existingItemIndex].quantity += quantity;
         } else {
-            return await cartModels.findOneAndUpdate(
-                { _id: cid },
-                {
-                    $push: {
-                        productos: {
-                            productoSchemaId: pid,
-                            referenciaSchema: referencia,
-                            quantity: quantity
-                        }
-                    }
-                },
-                { new: true, upsert: true }
-            );
+            const nuevoProducto = {
+                quantity,
+                [campoProducto]: pid
+            };
+            cart.productos.push(nuevoProducto);
         }
+
+        return await cart.save();
     }
 
+
     async deleteProductInCartDao(cid, pid, referencia) {
-        return await cartModels.findOneAndUpdate(
-            { _id: cid },
+        const fieldMap = {
+            hotel: "productoHotel",
+            vuelo: "productoVuelo",
+            paquete: "productoPaquete"
+        };
+    
+        const campoProducto = fieldMap[referencia];
+        if (!campoProducto) throw new Error("Tipo de producto inválido");
+    
+        const cart = await cartModels.findByIdAndUpdate(
+            cid,
             {
                 $pull: {
-                    productos: {
-                        productoSchemaId: pid,
-                        referenciaSchema: referencia
-                    }
+                    productos: { [campoProducto]: pid }
                 }
             },
-            { new: true }
+            { new: true } // Te devuelve el carrito actualizado
         );
+    
+        if (!cart) throw new Error("Carrito no encontrado");
+    
+        return cart;
     }
 
 

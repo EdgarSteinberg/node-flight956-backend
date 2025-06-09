@@ -1,5 +1,8 @@
 import { Router } from 'express';
+import passport from 'passport';
+import { authorization } from '../middlewares/authorization.js';
 import HotelesManager from "../controllers/hotelController.js";
+import uploader from '../utils/multer.js';
 const hotelService = new HotelesManager();
 
 const router = Router();
@@ -27,19 +30,27 @@ router.get("/:hid", async (req, res) => {
     }
 });
 
-router.post("/", async (req, res) => {
-    const { image, name, location, description, stars, nightPrice, price, breakfastIncluded } = req.body;
+router.post("/", passport.authenticate('jwt', { session: false }), authorization("admin", 'premium'), uploader.single('hotel'), async (req, res) => {
+    const { name, location, description, stars, nightPrice, price, breakfastIncluded, numberOfNights } = req.body;
+    const file = req.file;
     try {
-        const result = await hotelService.createHotel({ image, name, location, description, stars, nightPrice, price, breakfastIncluded });
+        const imagePath = file ? file.originalname : null;
+
+        const result = await hotelService.createHotel({ numberOfNights, image: imagePath, name, location, description, stars, nightPrice, price, breakfastIncluded });
         res.status(200).send({ status: "success", payload: result });
     } catch (error) {
         res.status(500).send({ status: "error", error: error.message });
     }
 });
 
-router.put("/:hid", async (req, res) => {
+router.put("/:hid", passport.authenticate('jwt', { session: false }), authorization("admin", 'premium'), uploader.single('hotel'), async (req, res) => {
     const { hid } = req.params;
     const updated = req.body;
+
+    // Si hay una imagen, añadimos el nombre de la imagen al objeto actualizado
+    if (req.file) {
+        updated.image = req.file.originalname;  // Asumimos que se guarda solo el nombre de la imagen
+    }
 
     try {
         const result = await hotelService.updatedHotel(hid, updated);
@@ -49,7 +60,8 @@ router.put("/:hid", async (req, res) => {
     }
 });
 
-router.delete("/:hid", async (req, res) => {
+
+router.delete("/:hid", passport.authenticate('jwt', { session: false }), authorization("admin", 'premium'), async (req, res) => {
     const { hid } = req.params;
 
     try {

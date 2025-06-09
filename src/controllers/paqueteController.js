@@ -11,6 +11,36 @@ class PaqueteManager {
         }
     }
 
+    async buscarPaquetePorProvincia(nombreProvincia) {
+        if (!nombreProvincia) throw new Error(`Debe agregar el nombre de la provincia`);
+
+        try {
+            const paquete = await paqueteDao.buscarPaquetePorProvinciaDao(nombreProvincia);
+            if (paquete.length === 0) {
+                throw new Error(`No se encontraron paquetes para la provincia: ${nombreProvincia}`);
+            }
+            return paquete;
+        } catch (error) {
+            throw new Error(`Error al buscar la provincia "${nombreProvincia}": ${error.message}`);
+
+        }
+    }
+
+    async buscarPaquetesFiltrados(busqueda) {
+        const { destino, desde_fecha, hasta_fecha } = busqueda;
+
+        if (!destino || !desde_fecha || !hasta_fecha) {
+            throw new Error('Todos los campos son obligatorios!');
+        }
+
+        try {
+            const result = await paqueteDao.buscarPaquetesFiltradosDao({ destino, desde_fecha, hasta_fecha })
+            return result;
+        } catch (error) {
+            throw new Error(`Error al obtener los paquetes: ${error.message}`);
+        }
+    }
+
     async getPaqueteById(pid) {
         try {
             const result = await paqueteDao.getPaqueteByIdDao(pid);
@@ -22,22 +52,24 @@ class PaqueteManager {
     }
 
     async createPaquete(paquete) {
-        const { image, vuelo, hotel, origen_salida, destino, desde_fecha, hasta_fecha, total_paquete } = paquete;
-        const paqueteError = [image, vuelo, hotel, origen_salida, destino, desde_fecha, hasta_fecha, total_paquete];
+        const { vuelo, hotel, destino, desde_fecha, hasta_fecha } = paquete;
 
-        if (paqueteError.some(paq => !paq)) {
-            throw new Error("Todos los campos son obligatorios");
+        if (!vuelo || !hotel || !destino || !desde_fecha || !hasta_fecha) {
+            throw new Error(`Todos los campos son obligatorios`)
         }
 
+        const desdeFecha = new Date();
+        const hastaFecha = new Date();
+        hastaFecha.setDate(desdeFecha.getDate() + 7); // 7 días después
         try {
-            return await paqueteDao.createPaqueteDao({ image, vuelo, hotel, origen_salida, destino, desde_fecha, hasta_fecha, total_paquete });
+            return await paqueteDao.createPaqueteDao({ vuelo, hotel, destino, desde_fecha: desdeFecha, hasta_fecha: hastaFecha });
         } catch (error) {
             throw new Error(`Error al crear el paquete: ${error.message}`);
         }
     }
 
     async updatedPaquete(pid, updated) {
-        const paquete = await this.getPaqueteById(pid); 
+        const paquete = await this.getPaqueteById(pid);
         if (!paquete) throw new Error(`El paquete con ID: ${pid} no se encontró`);
 
         if (!updated || Object.keys(updated).length === 0) {
@@ -45,14 +77,14 @@ class PaqueteManager {
         }
 
         try {
-            return await paqueteDao.updatedPaqueteDao(pid, updated); 
+            return await paqueteDao.updatedPaqueteDao(pid, updated);
         } catch (error) {
             throw new Error(`Error al actualizar el paquete: ${error.message}`);
         }
     }
 
     async deletePaquete(pid) {
-        const paquete = await this.getPaqueteById(pid);  
+        const paquete = await this.getPaqueteById(pid);
         if (!paquete) throw new Error(`El paquete con ID: ${pid} no se encontró`);
 
         try {

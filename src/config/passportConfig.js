@@ -1,6 +1,9 @@
 import passport from "passport";
 import jwt, { ExtractJwt } from 'passport-jwt';
+import dotenv from 'dotenv';
+dotenv.config();
 
+const SECRET_KEY = process.env.SECRET_KEY;
 
 const JWTStratergy = jwt.Strategy;
 
@@ -10,7 +13,8 @@ const initializatePassport = () => {
         new JWTStratergy(
             {
                 jwtFromRequest: ExtractJwt.fromExtractors([cookieExtractor]),
-                secretOrKey: "secretCookie"
+               /*  secretOrKey: "secretCookie" */
+               secretOrKey: SECRET_KEY
             },
             async (jwt_payload, done) => {
                 try {

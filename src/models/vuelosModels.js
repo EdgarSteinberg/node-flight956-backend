@@ -25,7 +25,7 @@ const vuelosSchema = new mongoose.Schema({
     incluye_equipaje: { type: Boolean, default: false }, // Si incluye valija en bodega
 
     // Relaciones (opcional)
-    pasajeros: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user_fli' }] // Usuarios con reserva
+    pasajeros: [{ type: mongoose.Schema.Types.ObjectId, ref: 'users_fli' }] // Usuarios con reserva
 });
 
 const vuelosModels = mongoose.model(vuelosCollection, vuelosSchema);

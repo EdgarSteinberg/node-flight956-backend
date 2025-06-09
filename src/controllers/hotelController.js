@@ -18,9 +18,9 @@ class HotelesManager {
     }
 
     async createHotel(hotel) {
-        const { image, name, location, description, stars, nightPrice, price, breakfastIncluded } = hotel;
+        const { image, name, location, description, stars,numberOfNights, nightPrice, price, breakfastIncluded } = hotel;
 
-        if (!name || !location || !description || !stars || !nightPrice || !price) {
+        if (!name || !location || !description || !stars || !nightPrice || !price || !image || !numberOfNights ) {
             throw new Error("Todos los campos son obligatorios!");
         }
 
@@ -31,6 +31,7 @@ class HotelesManager {
                 location,
                 description,
                 stars,
+                numberOfNights,
                 nightPrice,
                 price,
                 breakfastIncluded

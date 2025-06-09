@@ -4,13 +4,16 @@ import dotenv from 'dotenv';
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
+import path from 'path';
 
+import __dirname from './utils/dirname.js';
 import userRouter from './routes/userRouter.js';
 import hotelRouter from './routes/hotelRouter.js';
 import vuelosRouter from './routes/vuelosRouter.js';
 import paqueteRouter from './routes/paqueteRouter.js';
 import cartRouter from './routes/cartRouter.js'
 import provRouter from './routes/provRouter.js';
+import ticketRouter from './routes/ticketRouter.js';
 import initializatePassport from './config/passportConfig.js';
 
 dotenv.config();
@@ -26,9 +29,9 @@ app.use(cors({
 }));
 
 
-const mongoUri = process.env.NODE_ENV === 'test' 
-  ? process.env.MONGO_URI_TEST 
-  : process.env.MONGO_URI;
+const mongoUri = process.env.NODE_ENV === 'test'
+    ? process.env.MONGO_URI_TEST
+    : process.env.MONGO_URI;
 
 //MongoDB connect
 //const url = process.env.MONGO_URI;
@@ -43,7 +46,11 @@ mongoose.connect(mongoUri)
 //Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-//app.use(express.public('public'));
+// Sirve TODO public
+app.use(express.static(path.join(__dirname, '..', '..', 'public')));
+// Si quieres acceso más ordenado (opcional)
+//app.use('/image', express.static(path.join(__dirname, '..', '..', 'public', 'image')));
+
 app.use(cookieParser());
 
 //Passport
@@ -57,6 +64,7 @@ app.use('/api/provincias', provRouter);
 app.use('/api/vuelos', vuelosRouter);
 app.use('/api/paquetes', paqueteRouter);
 app.use('/api/carts', cartRouter);
+app.use('/api/ticket', ticketRouter);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {

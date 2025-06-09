@@ -7,6 +7,35 @@ class VuelosManager {
         return await vuelosDao.getAllVuelosDao();
     }
 
+    async buscarVueloProvincia(nombreProvincia) {
+        if (!nombreProvincia) throw new Error(`Nombre de provincia no encontrado`)
+        try {
+            const vuelos = await vuelosDao.buscarVueloProvinciaDao(nombreProvincia);
+
+            if (vuelos.length === 0) {
+                throw new Error(`No se encontraron vuelos para la provincia: ${nombreProvincia}`);
+            }
+
+            return vuelos;
+        } catch (error) {
+            throw new Error(`Error al obtener el vuelo por provincia ${error.message}`)
+        }
+    }
+
+    async buscarVuelosFiltrados(busqueda) {
+        const { origen, destino, vuelo_ida, vuelo_vuelta } = busqueda;
+
+        if (!origen || !destino || !vuelo_ida) {
+            throw new Error("Faltan datos obligatorios para buscar vuelos.");
+        }
+        try {
+            const result = await vuelosDao.buscarVuelosFiltradosDao({ origen, destino, vuelo_ida, vuelo_vuelta })
+            return result;
+        } catch (error) {
+            throw new Error(`Error al obtener los vuelos!`)
+        }
+    }
+
     async getVuelosById(vid) {
         try {
             const result = await vuelosDao.getVuelosByIdDao(vid);
@@ -21,9 +50,10 @@ class VuelosManager {
     async createVuelos(vuelo) {
         const { empresa, origen, destino, vuelo_ida, vuelo_vuelta, precio, duracion, clase, asientos_disponibles, incluye_equipaje, pasajeros } = vuelo;
 
-        const requiredFields = [empresa, origen, destino, vuelo_ida, duracion, clase, asientos_disponibles, pasajeros, precio];
-        if (requiredFields.some(field => !field)) {
-            throw new Error("Todos los campos son obligatorios");
+        if (!empresa || !origen || !destino || !vuelo_ida || !duracion || !clase || typeof precio !== 'number' || typeof asientos_disponibles !== 'number' ||
+            !Array.isArray(pasajeros)
+        ) {
+            throw new Error("Faltan campos obligatorios o tienen el tipo incorrecto");
         }
         try {
             const result = await vuelosDao.createVuelosDao({ empresa, origen, destino, vuelo_ida, vuelo_vuelta, precio, duracion, clase, asientos_disponibles, incluye_equipaje, pasajeros })
