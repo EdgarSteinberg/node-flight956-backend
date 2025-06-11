@@ -78,11 +78,6 @@ app.use('/api/docs', swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
 
 //Routes
 
-const router = Router();
-router.get('/', (req,res) => {
-    res.status(200).send({status: 'success'})
-})
-app.use('/', router)
 app.use('/api/users', userRouter);
 app.use('/api/hoteles', hotelRouter);
 app.use('/api/provincias', provRouter);
