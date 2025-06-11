@@ -1,0 +1,111 @@
+openapi: 3.0.1
+info:
+  title: API de Provincias
+  version: 1.0.0
+  description: Documentación de la API de Provincias
+
+paths:
+  /api/provincias:
+    get:
+      summary: Obtener todas las provincias
+      tags:
+        - Provincias
+      responses:
+        '200':
+          description: Lista de provincias
+        '500':
+          description: Error interno del servidor
+    post:
+      summary: Crear una nueva provincia
+      tags:
+        - Provincias
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                country:
+                  type: string
+                provincia:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Provincia creada exitosamente
+        '500':
+          description: Error interno del servidor
+
+  /api/provincias/{pid}:
+    get:
+      summary: Obtener una provincia por ID
+      tags:
+        - Provincias
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Provincia encontrada
+        '500':
+          description: Error interno del servidor
+    put:
+      summary: Actualizar una provincia por ID
+      tags:
+        - Provincias
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                country:
+                  type: string
+      responses:
+        '200':
+          description: Provincia actualizada exitosamente
+        '500':
+          description: Error interno del servidor
+    delete:
+      summary: Eliminar una provincia por ID
+      tags:
+        - Provincias
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Provincia eliminada exitosamente
+        '500':
+          description: Error interno del servidor
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

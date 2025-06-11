@@ -1,0 +1,142 @@
+openapi: 3.0.1
+info:
+  title: API de Hoteles
+  version: 1.0.0
+  description: Documentación de la API de Hoteles
+
+paths:
+  /api/hoteles:
+    get:
+      summary: Obtener todos los hoteles
+      tags:
+        - Hoteles
+      responses:
+        '200':
+          description: Lista de hoteles
+        '500':
+          description: Error interno del servidor
+    post:
+      summary: Crear un nuevo hotel
+      tags:
+        - Hoteles
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                location:
+                  type: string
+                description:
+                  type: string
+                stars:
+                  type: integer
+                nightPrice:
+                  type: number
+                price:
+                  type: number
+                breakfastIncluded:
+                  type: boolean
+                numberOfNights:
+                  type: integer
+                hotel:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Hotel creado exitosamente
+        '500':
+          description: Error interno del servidor
+
+  /api/hoteles/{hid}:
+    get:
+      summary: Obtener un hotel por ID
+      tags:
+        - Hoteles
+      parameters:
+        - name: hid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Hotel encontrado
+        '404':
+          description: Hotel no encontrado
+        '500':
+          description: Error interno del servidor
+    put:
+      summary: Actualizar un hotel por ID
+      tags:
+        - Hoteles
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: hid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                location:
+                  type: string
+                description:
+                  type: string
+                stars:
+                  type: integer
+                nightPrice:
+                  type: number
+                price:
+                  type: number
+                breakfastIncluded:
+                  type: boolean
+                numberOfNights:
+                  type: integer
+                hotel:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Hotel actualizado exitosamente
+        '500':
+          description: Error interno del servidor
+    delete:
+      summary: Eliminar un hotel por ID
+      tags:
+        - Hoteles
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: hid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Hotel eliminado exitosamente
+        '404':
+          description: Hotel no encontrado
+        '500':
+          description: Error interno del servidor
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

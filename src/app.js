@@ -5,6 +5,9 @@ import passport from 'passport';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import path from 'path';
+import swaggerJsDoc from 'swagger-jsdoc';
+import swaggerUiExpress from 'swagger-ui-express';
+
 
 import __dirname from './utils/dirname.js';
 import userRouter from './routes/userRouter.js';
@@ -15,7 +18,7 @@ import cartRouter from './routes/cartRouter.js'
 import provRouter from './routes/provRouter.js';
 import ticketRouter from './routes/ticketRouter.js';
 import initializatePassport from './config/passportConfig.js';
-
+import {Router}from 'express'
 dotenv.config();
 
 const app = express();
@@ -57,7 +60,29 @@ app.use(cookieParser());
 initializatePassport();
 app.use(passport.initialize());
 
+
+// Documentación Swagger
+const swaggerOptions = {
+    definition: {
+        openapi: '3.0.1',
+        info: {
+            title: 'API venta de pasajes turísticos.',
+            description: 'Documentación de mi API con Swagger.'
+        },
+    },
+    apis: [`${__dirname}/../docs/**/*.yaml`],  // Definir las rutas de la documentación Swagger
+};
+const specs = swaggerJsDoc(swaggerOptions);
+app.use('/api/docs', swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
+
+
 //Routes
+
+const router = Router();
+router.get('/', (req,res) => {
+    res.status(200).send({status: 'success'})
+})
+app.use('/', router)
 app.use('/api/users', userRouter);
 app.use('/api/hoteles', hotelRouter);
 app.use('/api/provincias', provRouter);
