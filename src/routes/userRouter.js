@@ -79,7 +79,9 @@ router.post('/login', async (req, res) => {
             maxAge: 60 * 60 * 1000, // 1 hora
             httpOnly: true,         // 🚨 Protege contra XSS
             secure: true,           // Solo por HTTPS en producción
-            sameSite: 'lax'         // Controla el envío en cross-site
+            sameSite: 'none'         // Controla el envío en cross-site
+
+    
         }).send(
             {
                 status: 'success',
