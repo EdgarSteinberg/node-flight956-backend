@@ -83,9 +83,16 @@ class TicketManager {
                 codigo
             };
 
-            const result = await ticketDao.createTicketDao(newTicket);
-            return result;
+            // const result = await ticketDao.createTicketDao(newTicket);
+            // return result;
+             const savedTicket = await ticketDao.createTicketDao(newTicket);
+            /* 4.‑ (opcional) asignarlo al usuario */
+            await userService.updatedUser(userId, { ticket: savedTicket._id });
 
+            /* 5.‑ vaciar carrito AHORA que el ticket existe */
+            await cartService.clearCart(cartId);
+
+            return savedTicket;         // devolvés el ticket ya guardado
         } catch (error) {
             throw new Error(`Error al crear el ticket: ${error.message}`);
         }
