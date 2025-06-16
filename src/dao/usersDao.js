@@ -7,7 +7,7 @@ class UsersDao {
     }
 
     async getUserByIdDao(uid) {
-        return await userModel.findById(uid);  // Devuelve un usuario por su ID
+        return await userModel.findById(uid).populate('ticket').lean();  // Devuelve un usuario por su ID
     }
 
     async getEmailDao(email) {

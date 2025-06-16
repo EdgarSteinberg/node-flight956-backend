@@ -25,7 +25,8 @@ const userSchema = new mongoose.Schema({
             reference: { type: String, required: true }, // ruta o URL del archivo
         }
     ],
-    last_connection: { type: Date, default: Date.now }
+    last_connection: { type: Date, default: Date.now },
+    ticket: {type : mongoose.Schema.Types.ObjectId, ref: 'ticket_fli'}
 });
 
 
