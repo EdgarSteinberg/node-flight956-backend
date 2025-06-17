@@ -201,19 +201,58 @@ class UserManager {
         await transport.sendMail({
             from: 'Edgar Steinberg <s.steinberg2019@gmail.com>',
             to: email,
-            subject: 'Recuperacion de contraseña',
-            html: `<div style="font-family: Arial, sans-serif; color: #333;">
-            <h1>Solicitud de Recuperación de Contraseña</h1>
-            <p>Hemos recibido una solicitud para restablecer tu contraseña. Si no realizaste esta solicitud, por favor ignora este correo.</p>
-            <p>Para restablecer tu contraseña, haz clic en el siguiente enlace:</p>
-            <a href="http://localhost:3000/reset-password?token=${token}">
-            <button class="btnChat">Restablecer Contraseña</button>
-            </a>
-            <p>Este enlace es válido por 1 hora.</p>
-            <p>Gracias,</p>
-            <p>El equipo de soporte </p>
-          </div>`
+            subject: 'Recuperación de contraseña',
+            html: `
+            <div style="
+                max-width: 480px;
+                margin: 0 auto;
+                padding: 24px;
+                font-family: Arial, sans-serif;
+                color: #333333;
+                background: #ffffff;
+                border: 1px solid #e0e0e0;
+                border-radius: 12px;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+                ">
+                <h2 style="margin-top: 0;">Solicitud de recuperación de contraseña</h2>
+
+                <p style="line-height: 1.5;">
+                Hemos recibido una petición para cambiar la contraseña de tu cuenta.
+                Haz clic en el botón de abajo para continuar.
+                </p>
+
+                <p style="line-height: 1.5;">
+                Si tú no hiciste esta solicitud, ignora este correo ✌️.
+                </p>
+
+                <!-- Botón “false but handsome”: en realidad es un <a> -->
+                <a href="http://localhost:3000/reset-password?token=${token}"
+                style="
+                    display: inline-block;
+                    padding: 12px 24px;
+                    margin: 16px 0;
+                    text-decoration: none;
+                    background: #ffffff;
+                    color: #000000;
+                    border: 2px solid #00aaff; /* celeste */
+                    border-radius: 7px;
+                    font-weight: bold;
+                    ">
+                Realizar cambio de contraseña
+                </a>
+
+                <p style="font-size: 14px; color: #666666;">
+                Este enlace es válido por 1 hora.
+                </p>
+
+                <p style="margin-bottom: 0;">
+                ¡Gracias!<br/>
+                El equipo de soporte
+                </p>
+            </div>
+            `
         });
+
 
         return token;
     }
