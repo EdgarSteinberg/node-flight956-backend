@@ -50,9 +50,16 @@ router.get("/:pid", async (req, res) => {
 });
 
 router.post("/", passport.authenticate('jwt', { session: false }), authorization("admin", 'premium'), uploader.single('image'), async (req, res) => {
+    const { vuelo, hotel, destino, desde_fecha, hasta_fecha, owner } = req.body
     try {
+        // Obtener el usuario autenticado
+        const userEmail = req.user.email;
+        const userRole = req.user.role;
 
-        const result = await paqueteService.createPaquete(req.body);
+        // Solo se pasa el owner si viene del req.user
+        const owner = userRole === 'premium' ? userEmail : 'admin';
+        
+        const result = await paqueteService.createPaquete({ vuelo, hotel, destino, desde_fecha, hasta_fecha, owner });
         res.status(200).send({ status: "success", payload: result });
     } catch (error) {
         res.status(500).send({ status: "error", error: error.message });

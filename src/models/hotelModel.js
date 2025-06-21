@@ -11,7 +11,8 @@ const hotelSchema = new mongoose.Schema({
     numberOfNights: { type: Number, required: true },
     nightPrice : { type: Number, required: true, min: 1 },
     price: { type: Number, required: true },
-    breakfastIncluded: { type: Boolean, default: false }
+    breakfastIncluded: { type: Boolean, default: false },
+    owner: {type: String, default: 'admin'}
 });
 
 const hotelModel = mongoose.model(hotelCollection, hotelSchema);

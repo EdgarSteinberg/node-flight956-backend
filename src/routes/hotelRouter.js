@@ -34,9 +34,17 @@ router.post("/", passport.authenticate('jwt', { session: false }), authorization
     const { name, location, description, stars, nightPrice, price, breakfastIncluded, numberOfNights } = req.body;
     const file = req.file;
     try {
+
+        // Obtener el usuario autenticado
+        const userEmail = req.user.email;
+        const userRole = req.user.role;
+
+        // Solo se pasa el owner si viene del req.user
+        const owner = userRole === 'premium' ? userEmail : 'admin';
+
         const imagePath = file ? file.originalname : null;
 
-        const result = await hotelService.createHotel({ numberOfNights, image: imagePath, name, location, description, stars, nightPrice, price, breakfastIncluded });
+        const result = await hotelService.createHotel({ numberOfNights, image: imagePath, name, location, description, stars, nightPrice, price, breakfastIncluded ,owner});
         res.status(200).send({ status: "success", payload: result });
     } catch (error) {
         res.status(500).send({ status: "error", error: error.message });

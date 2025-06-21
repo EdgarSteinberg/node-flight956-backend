@@ -8,6 +8,7 @@ const paqueteSchema = new mongoose.Schema({
     hotel: { type: mongoose.Schema.Types.ObjectId, ref: 'hotel_fli' },
     desde_fecha: { type: Date },
     hasta_fecha: { type: Date },
+    owner: {type: String, default: 'admin'}
 });
 
 const paqueteModels = mongoose.model(paqueteCollection, paqueteSchema);

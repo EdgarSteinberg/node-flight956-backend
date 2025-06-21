@@ -60,7 +60,14 @@ router.post("/", passport.authenticate('jwt', { session: false }), authorization
     const { empresa, origen, destino, vuelo_ida, vuelo_vuelta, precio, duracion, clase, asientos_disponibles, incluye_equipaje, pasajeros } = req.body;
 
     try {
-        const result = await vuelosService.createVuelos({ empresa, origen, destino, vuelo_ida, vuelo_vuelta, precio, duracion, clase, asientos_disponibles, incluye_equipaje, pasajeros });
+        // Obtener el usuario autenticado
+        const userEmail = req.user.email;
+        const userRole = req.user.role;
+
+        // Solo se pasa el owner si viene del req.user
+        const owner = userRole === 'premium' ? userEmail : 'admin';
+
+        const result = await vuelosService.createVuelos({ empresa, origen, destino, vuelo_ida, vuelo_vuelta, precio, duracion, clase, asientos_disponibles, incluye_equipaje, pasajeros, owner });
         res.status(201).send({ status: "success", payload: result });
     } catch (error) {
         res.status(500).send({ status: "error", error: error.message });
@@ -68,7 +75,7 @@ router.post("/", passport.authenticate('jwt', { session: false }), authorization
 });
 
 // Actualizar un vuelo
-router.put("/:vid",passport.authenticate('jwt', {session: false}), authorization('admin', 'premium'), async (req, res) => {
+router.put("/:vid", passport.authenticate('jwt', { session: false }), authorization('admin', 'premium'), async (req, res) => {
     const { vid } = req.params;
     const updated = req.body;
     try {
@@ -80,7 +87,7 @@ router.put("/:vid",passport.authenticate('jwt', {session: false}), authorization
 });
 
 // Eliminar un vuelo
-router.delete("/:vid",passport.authenticate('jwt', {session: false}), authorization('admin', 'premium') ,async (req, res) => {
+router.delete("/:vid", passport.authenticate('jwt', { session: false }), authorization('admin', 'premium'), async (req, res) => {
     const { vid } = req.params;
     try {
         const result = await vuelosService.deleteVuelos(vid);
