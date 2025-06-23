@@ -226,7 +226,7 @@ class UserManager {
                 </p>
 
                 <!-- Botón “false but handsome”: en realidad es un <a> -->
-                <a href="http://localhost:3000/reset-password?token=${token}"
+                <a href="https://fligth956.netlify.app/reset-password?token=${token}"
                 style="
                     display: inline-block;
                     padding: 12px 24px;
