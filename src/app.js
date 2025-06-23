@@ -18,16 +18,25 @@ import cartRouter from './routes/cartRouter.js'
 import provRouter from './routes/provRouter.js';
 import ticketRouter from './routes/ticketRouter.js';
 import initializatePassport from './config/passportConfig.js';
-import {Router}from 'express'
+import { Router } from 'express'
 dotenv.config();
 
 const app = express();
 
 // Configura CORS
-app.use(cors({
+/* app.use(cors({
     origin: 'http://localhost:3000', // Permite solicitudes solo desde el frontend de React (ajustar según tu URL)
     methods: ['GET', 'POST', 'PUT', 'DELETE'], // Los métodos que permitirás
     allowedHeaders: ['Content-Type', 'Authorization'], // Los encabezados permitidos
+    credentials: true
+})); */
+app.use(cors({
+    origin: [
+        'http://localhost:3000',             // desarrollo local
+        'https://fligth956.netlify.app'      // producción en Netlify
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 }));
 
