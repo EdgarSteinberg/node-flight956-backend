@@ -90,3 +90,6 @@ async function actualizarFechasVuelos() {
 }
 
 actualizarFechasVuelos();
+
+// comando para correr la actualizacion de los vuelos node src/utils/seedVuelos.js
+// desde PS C:\Users\ACER\Documents\fligth956\node\node-flight956-backend>
