@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-
+import { Resend } from "resend";
 import { createHash, isValidPassword } from "../utils/bcrypt.js";
 
 import UsersDao from "../dao/usersDao.js";
@@ -17,6 +17,7 @@ dotenv.config();
 const EMAIL = process.env.EMAIL_USER;
 const PASS = process.env.EMAIL_PASS;
 const SECRET_KEY = process.env.SECRET_KEY;
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 class UserManager {
 
@@ -181,78 +182,145 @@ class UserManager {
 
 
     //Enviar Email 
-    async sendEmail(email) {
-        const transport = nodemailer.createTransport({
-            service: 'gmail',
-            port: 587,
-            auth: {
-                user: EMAIL,
-                pass: PASS
+    /*     async sendEmail(email) {
+            const transport = nodemailer.createTransport({
+                service: 'gmail',
+                port: 587,
+                auth: {
+                    user: EMAIL,
+                    pass: PASS
+                }
+            });
+            const user = await userService.getEmailDao(email);
+            if (!user) {
+                throw new Error('Correo electronico no encontrado')
             }
-        });
+    
+            const token = jwt.sign({ email }, SECRET_KEY, { expiresIn: '1h' });
+            console.log(`Este el token desde el SendEmail`, token);
+    
+            await transport.sendMail({
+                from: 'Edgar Steinberg <s.steinberg2019@gmail.com>',
+                to: email,
+                subject: 'Recuperación de contraseña',
+                html: `
+                <div style="
+                    max-width: 480px;
+                    margin: 0 auto;
+                    padding: 24px;
+                    font-family: Arial, sans-serif;
+                    color: #333333;
+                    background: #ffffff;
+                    border: 1px solid #e0e0e0;
+                    border-radius: 12px;
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+                    ">
+                    <h2 style="margin-top: 0;">Solicitud de recuperación de contraseña</h2>
+    
+                    <p style="line-height: 1.5;">
+                    Hemos recibido una petición para cambiar la contraseña de tu cuenta.
+                    Haz clic en el botón de abajo para continuar.
+                    </p>
+    
+                    <p style="line-height: 1.5;">
+                    Si tú no hiciste esta solicitud, ignora este correo ✌️.
+                    </p>
+    
+                    <!-- Botón “false but handsome”: en realidad es un <a> -->
+                    <a href="https://fligth956.netlify.app/reset-password?token=${token}"
+                    style="
+                        display: inline-block;
+                        padding: 12px 24px;
+                        margin: 16px 0;
+                        text-decoration: none;
+                        background: #ffffff;
+                        color: #000000;
+                        border: 2px solid #00aaff;  
+                        border-radius: 7px;
+                        font-weight: bold;
+                        ">
+                    Realizar cambio de contraseña
+                    </a>
+    
+                    <p style="font-size: 14px; color: #666666;">
+                    Este enlace es válido por 1 hora.
+                    </p>
+    
+                    <p style="margin-bottom: 0;">
+                    ¡Gracias!<br/>
+                    El equipo de soporte
+                    </p>
+                </div>
+                `
+            });
+    
+    
+            return token;
+        } */
+
+    // Enviar Email
+    async sendEmail(email) {
         const user = await userService.getEmailDao(email);
         if (!user) {
-            throw new Error('Correo electronico no encontrado')
+            throw new Error('Correo electronico no encontrado');
         }
 
         const token = jwt.sign({ email }, SECRET_KEY, { expiresIn: '1h' });
         console.log(`Este el token desde el SendEmail`, token);
 
-        await transport.sendMail({
-            from: 'Edgar Steinberg <s.steinberg2019@gmail.com>',
+        await resend.emails.send({
+            from: 'Edgar Steinberg <onboarding@resend.dev>', // cambiar cuando verifiques dominio
             to: email,
             subject: 'Recuperación de contraseña',
             html: `
-            <div style="
-                max-width: 480px;
-                margin: 0 auto;
-                padding: 24px;
-                font-family: Arial, sans-serif;
-                color: #333333;
-                background: #ffffff;
-                border: 1px solid #e0e0e0;
-                border-radius: 12px;
-                box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-                ">
-                <h2 style="margin-top: 0;">Solicitud de recuperación de contraseña</h2>
+        <div style="
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 24px;
+            font-family: Arial, sans-serif;
+            color: #333333;
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        ">
+            <h2 style="margin-top: 0;">Solicitud de recuperación de contraseña</h2>
 
-                <p style="line-height: 1.5;">
+            <p style="line-height: 1.5;">
                 Hemos recibido una petición para cambiar la contraseña de tu cuenta.
                 Haz clic en el botón de abajo para continuar.
-                </p>
+            </p>
 
-                <p style="line-height: 1.5;">
+            <p style="line-height: 1.5;">
                 Si tú no hiciste esta solicitud, ignora este correo ✌️.
-                </p>
+            </p>
 
-                <!-- Botón “false but handsome”: en realidad es un <a> -->
-                <a href="https://fligth956.netlify.app/reset-password?token=${token}"
-                style="
-                    display: inline-block;
-                    padding: 12px 24px;
-                    margin: 16px 0;
-                    text-decoration: none;
-                    background: #ffffff;
-                    color: #000000;
-                    border: 2px solid #00aaff; /* celeste */
-                    border-radius: 7px;
-                    font-weight: bold;
-                    ">
+            <a href="https://fligth956.netlify.app/reset-password?token=${token}"
+               style="
+                display: inline-block;
+                padding: 12px 24px;
+                margin: 16px 0;
+                text-decoration: none;
+                background: #ffffff;
+                color: #000000;
+                border: 2px solid #00aaff;
+                border-radius: 7px;
+                font-weight: bold;
+               ">
                 Realizar cambio de contraseña
-                </a>
+            </a>
 
-                <p style="font-size: 14px; color: #666666;">
+            <p style="font-size: 14px; color: #666666;">
                 Este enlace es válido por 1 hora.
-                </p>
+            </p>
 
-                <p style="margin-bottom: 0;">
+            <p style="margin-bottom: 0;">
                 ¡Gracias!<br/>
                 El equipo de soporte
-                </p>
-            </div>
-            `
+            </p>
+        </div>
+        `
         });
-
 
         return token;
     }

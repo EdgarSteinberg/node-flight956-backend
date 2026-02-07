@@ -32,8 +32,8 @@ const app = express();
 })); */
 app.use(cors({
     origin: [
-        'http://localhost:3000',             // desarrollo local
-        'https://fligth956.netlify.app'      // producción en Netlify
+        'http://localhost:3000',              
+        'https://fligth956.netlify.app'       
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -86,7 +86,7 @@ app.use('/api/docs', swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
 
 
 //Routes
-
+ 
 app.use('/api/users', userRouter);
 app.use('/api/hoteles', hotelRouter);
 app.use('/api/provincias', provRouter);
